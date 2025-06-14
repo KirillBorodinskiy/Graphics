@@ -1,20 +1,15 @@
 package org.borodkir.graphics;
 
 import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.image.PixelReader;
-import javafx.scene.image.WritableImage;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.util.Pair;
 
 public class Main extends Application {
 
@@ -43,20 +38,32 @@ public class Main extends Application {
 
         dfsRadioButton.setSelected(true); // Default to DFS
 
-        HBox controlBox = new HBox(10, dfsRadioButton, bfsRadioButton);
-        controlBox.setPadding(new Insets(10));
+        ToggleGroup diagonalsGroup = new ToggleGroup();
+
+        RadioButton diagonalButton = new RadioButton("With Diagonals");
+        RadioButton nonDiagonalButton = new RadioButton("Without Diagonals");
+
+        diagonalButton.setToggleGroup(diagonalsGroup);
+        nonDiagonalButton.setToggleGroup(diagonalsGroup);
+
+        nonDiagonalButton.setSelected(true); // Default to non-diagonal
+
+        HBox algBox = new HBox(10, dfsRadioButton, bfsRadioButton);
+
+        HBox diagonalBox = new HBox(10, diagonalButton, nonDiagonalButton);
 
 
         // Add the radio buttons to the canvas
         canvas.setOnMouseClicked(event -> {
             boolean useDFS = dfsRadioButton.isSelected();
-            FillAlg.fillFromPoint(useDFS,gc, canvas, (int) event.getX(), (int) event.getY());
+            boolean diagonals = diagonalButton.isSelected();
+            FillAlg.fillFromPoint(useDFS,gc, canvas, (int) event.getX(), (int) event.getY(),diagonals);
         });
 
 
         // Set the background color of the canvas
 
-        VBox root = new VBox(10, controlBox, canvas);
+        VBox root = new VBox(10, algBox,diagonalBox, canvas);
         Scene scene = new Scene(root, width, height + 50);
         primaryStage.setScene(scene);
         primaryStage.show();

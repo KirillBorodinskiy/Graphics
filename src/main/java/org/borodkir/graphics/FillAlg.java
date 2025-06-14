@@ -11,7 +11,13 @@ import java.util.Queue;
 
 public class FillAlg {
 
-    protected static void fillFromPoint(boolean useDFS, GraphicsContext gc, Canvas canvas, int startX, int startY) {
+    protected static void fillFromPoint(
+            boolean useDFS, GraphicsContext gc,
+            Canvas canvas,
+            int startX,
+            int startY,
+            boolean diagonals
+    ) {
         WritableImage snapshot = canvas.snapshot(null, null);
         PixelReader reader = snapshot.getPixelReader();
         int width = (int) snapshot.getWidth();
@@ -26,14 +32,25 @@ public class FillAlg {
 
         boolean[][] visited = new boolean[width][height];
         if (useDFS) {
-            floodFillDFS(gc, visited, width, height, startX, startY, targetColor, replacement, snapshot);
+            floodFillDFS(gc, visited, width, height, startX, startY, targetColor, replacement, snapshot, diagonals);
         } else {
-            floodFillBFS(gc, visited, width, height, startX, startY, targetColor, replacement, snapshot);
+            floodFillBFS(gc, visited, width, height, startX, startY, targetColor, replacement, snapshot, diagonals);
 
         }
     }
 
-    private static void floodFillBFS(GraphicsContext gc, boolean[][] visited, int width, int height, int startX, int startY, Color targetColor, Color replacement, WritableImage snapshot) {
+    private static void floodFillBFS(
+            GraphicsContext gc,
+            boolean[][] visited,
+            int width,
+            int height,
+            int startX,
+            int startY,
+            Color targetColor,
+            Color replacement,
+            WritableImage snapshot,
+            boolean diagonals
+    ) {
         Queue<Pair<Integer, Integer>> queue = new java.util.LinkedList<>();
         queue.add(new Pair<>(startX, startY));
         final int BATCH_SIZE = 500;
@@ -70,11 +87,14 @@ public class FillAlg {
                     queue.add(new Pair<>(x - 1, y));
                     queue.add(new Pair<>(x, y + 1));
                     queue.add(new Pair<>(x, y - 1));
-//Diagonals
-//                    queue.add(new Pair<>(x + 1, y + 1));
-//                    queue.add(new Pair<>(x - 1, y - 1));
-//                    queue.add(new Pair<>(x + 1, y - 1));
-//                    queue.add(new Pair<>(x - 1, y + 1));
+
+                    //Diagonals
+                    if (diagonals) {
+                        queue.add(new Pair<>(x + 1, y + 1));
+                        queue.add(new Pair<>(x - 1, y - 1));
+                        queue.add(new Pair<>(x + 1, y - 1));
+                        queue.add(new Pair<>(x - 1, y + 1));
+                    }
 
                     processedInBatch++;
                 }
@@ -87,8 +107,18 @@ public class FillAlg {
         timer.start();
     }
 
-    protected static void floodFillDFS(GraphicsContext gc, boolean[][] visited, int width,
-                                       int height, int x, int y, Color clickedColor, Color newColor, WritableImage snapshot) {
+    protected static void floodFillDFS(
+            GraphicsContext gc,
+            boolean[][] visited,
+            int width,
+            int height,
+            int x,
+            int y,
+            Color clickedColor,
+            Color newColor,
+            WritableImage snapshot,
+            boolean diagonals
+    ) {
         // Use a stack to track positions we need to process
         java.util.Stack<Pair<Integer, Integer>> stack = new java.util.Stack<>();
         stack.push(new Pair<>(x, y));
@@ -128,11 +158,14 @@ public class FillAlg {
                     stack.push(new Pair<>(px, py - 1));
                     stack.push(new Pair<>(px + 1, py));
                     stack.push(new Pair<>(px - 1, py));
-//Diagonals
-//                    stack.push(new Pair<>(px + 1, py + 1));
-//                    stack.push(new Pair<>(px - 1, py - 1));
-//                    stack.push(new Pair<>(px + 1, py - 1));
-//                    stack.push(new Pair<>(px - 1, py + 1));
+
+                    //Diagonals
+                    if (diagonals) {
+                        stack.push(new Pair<>(px + 1, py + 1));
+                        stack.push(new Pair<>(px - 1, py - 1));
+                        stack.push(new Pair<>(px + 1, py - 1));
+                        stack.push(new Pair<>(px - 1, py + 1));
+                    }
 
                     processedInBatch++;
                 }
