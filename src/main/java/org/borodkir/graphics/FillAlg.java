@@ -27,18 +27,64 @@ public class FillAlg {
         boolean[][] visited = new boolean[width][height];
         if (useDFS) {
             floodFillDFS(gc, visited, width, height, startX, startY, targetColor, replacement, snapshot);
-        } else{
+        } else {
             floodFillBFS(gc, visited, width, height, startX, startY, targetColor, replacement, snapshot);
 
         }
     }
 
     private static void floodFillBFS(GraphicsContext gc, boolean[][] visited, int width, int height, int startX, int startY, Color targetColor, Color replacement, WritableImage snapshot) {
-        Queue <Pair<Integer, Integer>> queue = new java.util.LinkedList<>();
+        Queue<Pair<Integer, Integer>> queue = new java.util.LinkedList<>();
         queue.add(new Pair<>(startX, startY));
         final int BATCH_SIZE = 500;
 
-        //TODO
+        javafx.animation.AnimationTimer timer = new javafx.animation.AnimationTimer() {
+            int processedInBatch = 0;
+
+            @Override
+            public void handle(long now) {
+                processedInBatch = 0;
+
+                while (!queue.isEmpty() && processedInBatch < BATCH_SIZE) {
+                    Pair<Integer, Integer> pos = queue.poll();
+                    int x = pos.getKey();
+                    int y = pos.getValue();
+
+                    if (x < 0 || y < 0 || x >= width || y >= height || visited[x][y]) {
+                        continue;
+                    }
+
+                    Color currentColor = snapshot.getPixelReader().getColor(x, y);
+                    if (!currentColor.equals(targetColor) || currentColor.equals(replacement)) {
+                        continue;
+                    }
+
+                    // Mark as visited and fill
+                    visited[x][y] = true;
+                    snapshot.getPixelWriter().setColor(x, y, replacement);
+                    gc.setFill(replacement);
+                    gc.fillRect(x, y, 1, 1);
+
+                    // Add neighbors to the queue
+                    queue.add(new Pair<>(x + 1, y));
+                    queue.add(new Pair<>(x - 1, y));
+                    queue.add(new Pair<>(x, y + 1));
+                    queue.add(new Pair<>(x, y - 1));
+//Diagonals
+//                    queue.add(new Pair<>(x + 1, y + 1));
+//                    queue.add(new Pair<>(x - 1, y - 1));
+//                    queue.add(new Pair<>(x + 1, y - 1));
+//                    queue.add(new Pair<>(x - 1, y + 1));
+
+                    processedInBatch++;
+                }
+
+                if (queue.isEmpty()) {
+                    this.stop();
+                }
+            }
+        };
+        timer.start();
     }
 
     protected static void floodFillDFS(GraphicsContext gc, boolean[][] visited, int width,
@@ -82,11 +128,11 @@ public class FillAlg {
                     stack.push(new Pair<>(px, py - 1));
                     stack.push(new Pair<>(px + 1, py));
                     stack.push(new Pair<>(px - 1, py));
-
-                    stack.push(new Pair<>(px + 1, py + 1));
-                    stack.push(new Pair<>(px - 1, py - 1));
-                    stack.push(new Pair<>(px + 1, py - 1));
-                    stack.push(new Pair<>(px - 1, py + 1));
+//Diagonals
+//                    stack.push(new Pair<>(px + 1, py + 1));
+//                    stack.push(new Pair<>(px - 1, py - 1));
+//                    stack.push(new Pair<>(px + 1, py - 1));
+//                    stack.push(new Pair<>(px - 1, py + 1));
 
                     processedInBatch++;
                 }
