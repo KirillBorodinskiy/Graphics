@@ -4,12 +4,15 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+
+import java.util.ArrayList;
 
 public class Main extends Application {
 
@@ -52,18 +55,39 @@ public class Main extends Application {
 
         HBox diagonalBox = new HBox(10, diagonalButton, nonDiagonalButton);
 
+        //Points for convex fill
+        ArrayList<Point> points = new ArrayList<>();
+
+        ToggleGroup modeGroup = new ToggleGroup();
+        RadioButton fillAllModeButton = new RadioButton("Fill space");
+        RadioButton drawModeButton = new RadioButton("Set points for convex fill");
+        Button FillConvexShapeButton = new Button("Fill Shape");
+        FillConvexShapeButton.setOnAction(event -> {
+            if (drawModeButton.isSelected()) {
+                ConvexFill.pinedaFill(points, canvas);
+            }
+        });
+        fillAllModeButton.setToggleGroup(modeGroup);
+        drawModeButton.setToggleGroup(modeGroup);
+        fillAllModeButton.setSelected(true); // Default to fill mode
+        HBox modeBox = new HBox(10, fillAllModeButton, drawModeButton, FillConvexShapeButton);
+
 
         // Add the radio buttons to the canvas
         canvas.setOnMouseClicked(event -> {
-            boolean useDFS = dfsRadioButton.isSelected();
-            boolean diagonals = diagonalButton.isSelected();
-            FillAlg.fillFromPoint(useDFS, canvas, (int) event.getX(), (int) event.getY(), diagonals);
+            if (fillAllModeButton.isSelected()) {
+                boolean useDFS = dfsRadioButton.isSelected();
+                boolean diagonals = diagonalButton.isSelected();
+                FillAlg.fillFromPoint(useDFS, canvas, (int) event.getX(), (int) event.getY(), diagonals);
+            } else {
+                ConvexFill.setPoint(points, canvas, (int) event.getX(), (int) event.getY(),Color.BLACK);
+            }
         });
 
 
         // Set the background color of the canvas
 
-        VBox root = new VBox(10, algBox, diagonalBox, canvas);
+        VBox root = new VBox(10, algBox, diagonalBox,modeBox, canvas);
         Scene scene = new Scene(root, width, height + 50);
         primaryStage.setScene(scene);
         primaryStage.show();
