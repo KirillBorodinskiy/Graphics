@@ -31,15 +31,10 @@ public class FillAlg {
         if (targetColor.equals(replacement)) return;
 
         boolean[][] visited = new boolean[width][height];
-        if (useDFS) {
-            floodFillDFS(gc, visited, width, height, startX, startY, targetColor, replacement, snapshot, diagonals);
-        } else {
-            floodFillBFS(gc, visited, width, height, startX, startY, targetColor, replacement, snapshot, diagonals);
-
-        }
+        floodFill(gc, visited, width, height, startX, startY, targetColor, replacement, snapshot, useDFS, diagonals);
     }
 
-    private static void floodFillBFS(
+    private static void floodFill(
             GraphicsContext gc,
             boolean[][] visited,
             int width,
@@ -49,12 +44,17 @@ public class FillAlg {
             Color targetColor,
             Color replacement,
             WritableImage snapshot,
+            boolean useDFS,
             boolean diagonals
     ) {
-        Queue<Pair<Integer, Integer>> queue = new java.util.LinkedList<>();
-        queue.add(new Pair<>(startX, startY));
+        FloodContainer container;
+        if (useDFS) {
+            container = new StackContainer();
+        } else {
+            container = new QueueContainer();
+        }
+        container.add(startX, startY);
         final int BATCH_SIZE = 500;
-
         javafx.animation.AnimationTimer timer = new javafx.animation.AnimationTimer() {
             int processedInBatch = 0;
 
@@ -62,8 +62,8 @@ public class FillAlg {
             public void handle(long now) {
                 processedInBatch = 0;
 
-                while (!queue.isEmpty() && processedInBatch < BATCH_SIZE) {
-                    Pair<Integer, Integer> pos = queue.poll();
+                while (!container.isEmpty() && processedInBatch < BATCH_SIZE) {
+                    Pair<Integer, Integer> pos = container.get();
                     int x = pos.getKey();
                     int y = pos.getValue();
 
@@ -83,100 +83,27 @@ public class FillAlg {
                     gc.fillRect(x, y, 1, 1);
 
                     // Add neighbors to the queue
-                    queue.add(new Pair<>(x + 1, y));
-                    queue.add(new Pair<>(x - 1, y));
-                    queue.add(new Pair<>(x, y + 1));
-                    queue.add(new Pair<>(x, y - 1));
+                    container.add(x + 1, y);
+                    container.add(x - 1, y);
+                    container.add(x, y + 1);
+                    container.add(x, y - 1);
 
                     //Diagonals
                     if (diagonals) {
-                        queue.add(new Pair<>(x + 1, y + 1));
-                        queue.add(new Pair<>(x - 1, y - 1));
-                        queue.add(new Pair<>(x + 1, y - 1));
-                        queue.add(new Pair<>(x - 1, y + 1));
+                        container.add(x + 1, y + 1);
+                        container.add(x - 1, y - 1);
+                        container.add(x + 1, y - 1);
+                        container.add(x - 1, y + 1);
                     }
 
                     processedInBatch++;
                 }
 
-                if (queue.isEmpty()) {
+                if (container.isEmpty()) {
                     this.stop();
                 }
             }
         };
         timer.start();
     }
-
-    protected static void floodFillDFS(
-            GraphicsContext gc,
-            boolean[][] visited,
-            int width,
-            int height,
-            int x,
-            int y,
-            Color clickedColor,
-            Color newColor,
-            WritableImage snapshot,
-            boolean diagonals
-    ) {
-        // Use a stack to track positions we need to process
-        java.util.Stack<Pair<Integer, Integer>> stack = new java.util.Stack<>();
-        stack.push(new Pair<>(x, y));
-
-        // Process a limited number of pixels per batch
-        final int BATCH_SIZE = 500;
-
-        javafx.animation.AnimationTimer timer = new javafx.animation.AnimationTimer() {
-            int processedInBatch = 0;
-
-            @Override
-            public void handle(long now) {
-                processedInBatch = 0;
-
-                while (!stack.isEmpty() && processedInBatch < BATCH_SIZE) {
-                    Pair<Integer, Integer> pos = stack.pop();
-                    int px = pos.getKey();
-                    int py = pos.getValue();
-
-                    if (px < 0 || py < 0 || px >= width || py >= height || visited[px][py]) {
-                        continue;
-                    }
-
-                    Color currentColor = snapshot.getPixelReader().getColor(px, py);
-                    if (!currentColor.equals(clickedColor) || currentColor.equals(newColor)) {
-                        continue;
-                    }
-
-                    // Mark as visited and fill
-                    visited[px][py] = true;
-                    snapshot.getPixelWriter().setColor(px, py, newColor);
-                    gc.setFill(newColor);
-                    gc.fillRect(px, py, 1, 1);
-
-                    // Add neighbors to the stack
-                    stack.push(new Pair<>(px, py + 1));
-                    stack.push(new Pair<>(px, py - 1));
-                    stack.push(new Pair<>(px + 1, py));
-                    stack.push(new Pair<>(px - 1, py));
-
-                    //Diagonals
-                    if (diagonals) {
-                        stack.push(new Pair<>(px + 1, py + 1));
-                        stack.push(new Pair<>(px - 1, py - 1));
-                        stack.push(new Pair<>(px + 1, py - 1));
-                        stack.push(new Pair<>(px - 1, py + 1));
-                    }
-
-                    processedInBatch++;
-                }
-
-                if (stack.isEmpty()) {
-                    this.stop();
-                }
-            }
-        };
-
-        timer.start();
-    }
-
 }
