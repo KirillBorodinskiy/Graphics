@@ -1,6 +1,7 @@
 package org.borodkir.graphics;
 
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
@@ -10,6 +11,7 @@ public class FillAlg {
     protected static void fillFromPoint(
             boolean useDFS,
             Canvas canvas,
+            GraphicsContext gc,
             int startX,
             int startY,
             boolean diagonals
@@ -26,7 +28,7 @@ public class FillAlg {
         if (targetColor.equals(replacement)) return;
 
         boolean[][] visited = new boolean[width][height];
-        floodFill(visited, width, height, startX, startY, targetColor, replacement, snapshot, useDFS, diagonals);
+        floodFill(visited, width, height, startX, startY, targetColor, replacement, snapshot, gc, useDFS, diagonals);
     }
 
     private static void floodFill(
@@ -38,6 +40,7 @@ public class FillAlg {
             Color targetColor,
             Color replacement,
             WritableImage snapshot,
+            GraphicsContext gc,
             boolean useDFS,
             boolean diagonals
     ) {
@@ -72,7 +75,7 @@ public class FillAlg {
 
                     // Mark as visited and fill
                     visited[x][y] = true;
-                    snapshot.getPixelWriter().setColor(x, y, replacement);
+                    gc.getPixelWriter().setColor(x, y, replacement);
 
                     // Add neighbors to the queue
                     container.add(x + 1, y);

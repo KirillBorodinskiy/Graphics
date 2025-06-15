@@ -17,7 +17,7 @@ public class ConvexFill {
         points.add(new Point(x, y, color));
 
         //Draw the point on the canvas
-        canvas.getGraphicsContext2D().fillRect(x, y, 1, 1);
+        canvas.getGraphicsContext2D().fillRect(x-1, y-1, 3, 3);
     }
 
 
@@ -73,5 +73,6 @@ public class ConvexFill {
                 }
             }
         }
+        points.clear();
     }
 }

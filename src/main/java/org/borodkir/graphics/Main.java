@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
@@ -78,7 +79,7 @@ public class Main extends Application {
             if (fillAllModeButton.isSelected()) {
                 boolean useDFS = dfsRadioButton.isSelected();
                 boolean diagonals = diagonalButton.isSelected();
-                FillAlg.fillFromPoint(useDFS, canvas, (int) event.getX(), (int) event.getY(), diagonals);
+                FillAlg.fillFromPoint(useDFS, canvas, gc,(int) event.getX(), (int) event.getY(), diagonals);
             } else {
                 ConvexFill.setPoint(points, canvas, (int) event.getX(), (int) event.getY(),Color.BLACK);
             }
@@ -124,5 +125,13 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    // Show a simple information alert
+    private void showAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Information");
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }
