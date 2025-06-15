@@ -57,13 +57,13 @@ public class Main extends Application {
         canvas.setOnMouseClicked(event -> {
             boolean useDFS = dfsRadioButton.isSelected();
             boolean diagonals = diagonalButton.isSelected();
-            FillAlg.fillFromPoint(useDFS,gc, canvas, (int) event.getX(), (int) event.getY(),diagonals);
+            FillAlg.fillFromPoint(useDFS, canvas, (int) event.getX(), (int) event.getY(), diagonals);
         });
 
 
         // Set the background color of the canvas
 
-        VBox root = new VBox(10, algBox,diagonalBox, canvas);
+        VBox root = new VBox(10, algBox, diagonalBox, canvas);
         Scene scene = new Scene(root, width, height + 50);
         primaryStage.setScene(scene);
         primaryStage.show();

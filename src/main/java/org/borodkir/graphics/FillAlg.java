@@ -1,29 +1,24 @@
 package org.borodkir.graphics;
 
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
 
-import java.util.Queue;
-
 public class FillAlg {
 
     protected static void fillFromPoint(
-            boolean useDFS, GraphicsContext gc,
+            boolean useDFS,
             Canvas canvas,
             int startX,
             int startY,
             boolean diagonals
     ) {
         WritableImage snapshot = canvas.snapshot(null, null);
-        PixelReader reader = snapshot.getPixelReader();
         int width = (int) snapshot.getWidth();
         int height = (int) snapshot.getHeight();
 
-        Color targetColor = reader.getColor(startX, startY);
+        Color targetColor = snapshot.getPixelReader().getColor(startX, startY);
         Color replacement = Color.rgb(
                 (int) (Math.random() * 255),
                 (int) (Math.random() * 255),
@@ -31,11 +26,10 @@ public class FillAlg {
         if (targetColor.equals(replacement)) return;
 
         boolean[][] visited = new boolean[width][height];
-        floodFill(gc, visited, width, height, startX, startY, targetColor, replacement, snapshot, useDFS, diagonals);
+        floodFill(visited, width, height, startX, startY, targetColor, replacement, snapshot, useDFS, diagonals);
     }
 
     private static void floodFill(
-            GraphicsContext gc,
             boolean[][] visited,
             int width,
             int height,
@@ -72,15 +66,13 @@ public class FillAlg {
                     }
 
                     Color currentColor = snapshot.getPixelReader().getColor(x, y);
-                    if (!currentColor.equals(targetColor) || currentColor.equals(replacement)) {
+                    if (!currentColor.equals(targetColor)) {
                         continue;
                     }
 
                     // Mark as visited and fill
                     visited[x][y] = true;
                     snapshot.getPixelWriter().setColor(x, y, replacement);
-                    gc.setFill(replacement);
-                    gc.fillRect(x, y, 1, 1);
 
                     // Add neighbors to the queue
                     container.add(x + 1, y);
