@@ -9,16 +9,12 @@ public class BoundingBox {
     final int startY;
     final int endX;
     final int endY;
-    final int width;
-    final int height;
 
     public BoundingBox(int startX, int startY, int endX, int endY) {
         this.startX = startX;
         this.startY = startY;
         this.endX = endX;
         this.endY = endY;
-        this.width = endX - startX;
-        this.height = endY - startY;
     }
 
     public static BoundingBox createBoundingBox(ArrayList<Point> points, Canvas canvas) {

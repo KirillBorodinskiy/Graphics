@@ -14,21 +14,19 @@ public class FillAlg {
             GraphicsContext gc,
             int startX,
             int startY,
-            boolean diagonals
+            boolean diagonals,
+            Color replacementColor
     ) {
+        gc.setImageSmoothing(false);
         WritableImage snapshot = canvas.snapshot(null, null);
         int width = (int) snapshot.getWidth();
         int height = (int) snapshot.getHeight();
 
         Color targetColor = snapshot.getPixelReader().getColor(startX, startY);
-        Color replacement = Color.rgb(
-                (int) (Math.random() * 255),
-                (int) (Math.random() * 255),
-                (int) (Math.random() * 255));
-        if (targetColor.equals(replacement)) return;
+        if (targetColor.equals(replacementColor)) return;
 
         boolean[][] visited = new boolean[width][height];
-        floodFill(visited, width, height, startX, startY, targetColor, replacement, snapshot, gc, useDFS, diagonals);
+        floodFill(visited, width, height, startX, startY, targetColor, replacementColor, snapshot, gc, useDFS, diagonals);
     }
 
     private static void floodFill(
@@ -44,6 +42,7 @@ public class FillAlg {
             boolean useDFS,
             boolean diagonals
     ) {
+        gc.setImageSmoothing(false);
         FloodContainer container;
         if (useDFS) {
             container = new StackContainer();

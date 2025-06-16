@@ -1,5 +1,6 @@
 package org.borodkir.graphics;
 
+import javafx.application.Platform;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.paint.Color;
 
@@ -8,28 +9,37 @@ import java.util.List;
 
 public class ConvexFill {
     public static void setPoint(List<Point> points, Canvas canvas, int x, int y, Color color) {
-
         // Check if the point is within the canvas bounds
-        if (x < 0 || x >= canvas.getWidth() || y < 0 || y >= canvas.getHeight()) {
+        if (x-1 < 0 || x+1 >= canvas.getWidth() || y-1 < 0 || y+1 >= canvas.getHeight()) {
             throw new IllegalArgumentException("Point is out of canvas bounds");
         }
         // add the point to the list
         points.add(new Point(x, y, color));
 
         //Draw the point on the canvas
-        canvas.getGraphicsContext2D().fillRect(x-1, y-1, 3, 3);
+        var gc = canvas.getGraphicsContext2D();
+        gc.setImageSmoothing(false);
+        gc.setFill(color);
+        gc.fillRect(x - 1, y - 1, 3, 3);
     }
-
-
 
     public static void pinedaFill(ArrayList<Point> points, Canvas canvas) {
         if (points.size() < 3) {
-            throw new IllegalArgumentException("At least three points are required");
+            Platform.runLater(() -> {
+                Main.alert("At least 3 points is required for filling.");
+            });
+            return;
         }
-
+        Platform.runLater(() -> {
+            Main.alert("filling with " + points.size() + " points.");
+            points.clear();
+        });
+        
         BoundingBox boundingBox = BoundingBox.createBoundingBox(points, canvas);
         Color fillColor = points.getFirst().color;
-        var pixelWriter = canvas.getGraphicsContext2D().getPixelWriter();
+        var gc = canvas.getGraphicsContext2D();
+        gc.setImageSmoothing(false);
+        var pixelWriter = gc.getPixelWriter();
 
         // Precompute edge functions
         List<EdgeFunction> edges = new ArrayList<>();
@@ -41,23 +51,19 @@ public class ConvexFill {
 
         // Scan through bounding box
         for (int y = boundingBox.startY; y <= boundingBox.endY; y++) {
-            // Find the x range for this scanline (optional optimization)
-            int minX = boundingBox.startX;
-            int maxX = boundingBox.endX;
-
             // Initialize edge values for the leftmost pixel on this scanline
             double[] edgeValues = new double[edges.size()];
             for (int i = 0; i < edges.size(); i++) {
-                edgeValues[i] = edges.get(i).isInside(minX, y);
+                edgeValues[i] = edges.get(i).evaluate(boundingBox.startX, y);
             }
 
             // Fill the scanline
-            for (int x = minX; x <= maxX; x++) {
+            for (int x = boundingBox.startX; x <= boundingBox.endX; x++) {
                 boolean inside = true;
 
-                // Check if inside all edges
+                // Check if inside all edges or on an edge
                 for (double value : edgeValues) {
-                    if (value <= 0) {
+                    if (value < 0) {
                         inside = false;
                         break;
                     }
@@ -67,12 +73,11 @@ public class ConvexFill {
                     pixelWriter.setColor(x, y, fillColor);
                 }
 
-                // Increment edge values using the edge slopes (more efficient)
+                // Increment edge values using the edge slopes
                 for (int i = 0; i < edges.size(); i++) {
                     edgeValues[i] += edges.get(i).a;
                 }
             }
         }
-        points.clear();
     }
 }
