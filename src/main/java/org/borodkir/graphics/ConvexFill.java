@@ -7,14 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConvexFill {
-    public static void setPoint(List<Point> points, Canvas canvas, int x, int y, Color color) {
+    public static void setPoint(List<Point> points, Canvas canvas, int x, int y) {
 
         // Check if the point is within the canvas bounds
         if (x < 0 || x >= canvas.getWidth() || y < 0 || y >= canvas.getHeight()) {
             throw new IllegalArgumentException("Point is out of canvas bounds");
         }
         // add the point to the list
-        points.add(new Point(x, y, color));
+        points.add(new Point(x, y));
 
         //Draw the point on the canvas
         canvas.getGraphicsContext2D().fillRect(x-1, y-1, 3, 3);
@@ -24,11 +24,13 @@ public class ConvexFill {
 
     public static void pinedaFill(ArrayList<Point> points, Canvas canvas) {
         if (points.size() < 3) {
-            throw new IllegalArgumentException("At least three points are required");
+            Main.showAlert("You must have at least 3 points to fill");
+            return;
         }
+        Main.showAlert("Filling from " + points.size() + " points using Pineda's algorithm");
 
         BoundingBox boundingBox = BoundingBox.createBoundingBox(points, canvas);
-        Color fillColor = points.getFirst().color;
+        Color fillColor = Color.color(Math.random(), Math.random(), Math.random());
         var pixelWriter = canvas.getGraphicsContext2D().getPixelWriter();
 
         // Precompute edge functions
@@ -41,7 +43,7 @@ public class ConvexFill {
 
         // Scan through bounding box
         for (int y = boundingBox.startY; y <= boundingBox.endY; y++) {
-            // Find the x range for this scanline (optional optimization)
+            // Find the x range for this scanline
             int minX = boundingBox.startX;
             int maxX = boundingBox.endX;
 

@@ -81,7 +81,7 @@ public class Main extends Application {
                 boolean diagonals = diagonalButton.isSelected();
                 FillAlg.fillFromPoint(useDFS, canvas, gc,(int) event.getX(), (int) event.getY(), diagonals);
             } else {
-                ConvexFill.setPoint(points, canvas, (int) event.getX(), (int) event.getY(),Color.BLACK);
+                ConvexFill.setPoint(points, canvas, (int) event.getX(), (int) event.getY());
             }
         });
 
@@ -89,7 +89,7 @@ public class Main extends Application {
         // Set the background color of the canvas
 
         VBox root = new VBox(10, algBox, diagonalBox,modeBox, canvas);
-        Scene scene = new Scene(root, width, height + 50);
+        Scene scene = new Scene(root, width, width);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -128,9 +128,8 @@ public class Main extends Application {
     }
 
     // Show a simple information alert
-    private void showAlert(String message) {
+    public static void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Information");
         alert.setContentText(message);
         alert.showAndWait();
     }
