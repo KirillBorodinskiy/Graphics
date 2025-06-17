@@ -7,21 +7,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConvexFill {
+    /**
+     * Sets a point on the canvas and adds it to the list of points.
+     * The point is drawn as a small rectangle.
+     * The size of the rectangle is 3x3 pixels, making it easier to see.
+     *
+     * @param points The list of points to which the new point will be added.
+     * @param canvas The canvas on which the point will be drawn.
+     * @param x      The x-coordinate of the point.
+     * @param y      The y-coordinate of the point.
+     */
     public static void setPoint(List<Point> points, Canvas canvas, int x, int y) {
 
         // Check if the point is within the canvas bounds
         if (x < 0 || x >= canvas.getWidth() || y < 0 || y >= canvas.getHeight()) {
             throw new IllegalArgumentException("Point is out of canvas bounds");
         }
-        // add the point to the list
+        // Add the point to the list
         points.add(new Point(x, y));
 
-        //Draw the point on the canvas
-        canvas.getGraphicsContext2D().fillRect(x-1, y-1, 3, 3);
+        // Draw the point on the canvas
+        canvas.getGraphicsContext2D().fillRect(x - 1, y - 1, 3, 3);
     }
 
-
-
+    /**
+     * Fills the area defined by the given points using Pineda's algorithm.
+     * This method assumes that the points form a convex polygon.
+     *
+     * @param points The list of points set in counter-clockwise order that define the convex polygon.
+     * @param canvas The canvas on which to fill the area.
+     */
     public static void pinedaFill(ArrayList<Point> points, Canvas canvas) {
         if (points.size() < 3) {
             Main.showAlert("You must have at least 3 points to fill");
@@ -69,7 +84,7 @@ public class ConvexFill {
                     pixelWriter.setColor(x, y, fillColor);
                 }
 
-                // Increment edge values using the edge slopes (more efficient)
+                // Increment edge values using the edge slopes
                 for (int i = 0; i < edges.size(); i++) {
                     edgeValues[i] += edges.get(i).a;
                 }

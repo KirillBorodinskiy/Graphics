@@ -8,6 +8,17 @@ import javafx.util.Pair;
 
 public class FillAlg {
 
+    /**
+     * Fills the area starting from the given point (startX, startY) with a random color.
+     * Delegates the filling process to a private floodFill method.
+     *
+     * @param useDFS      If true, uses Depth-First Search; otherwise, uses Breadth-First Search.
+     * @param canvas      The canvas on which to perform the fill operation.
+     * @param gc          The GraphicsContext of the canvas to draw on.
+     * @param startX      The x-coordinate of the starting point for the fill.
+     * @param startY      The y-coordinate of the starting point for the fill.
+     * @param diagonals   If true, allows diagonal filling; otherwise, only fills orthogonally.
+     */
     protected static void fillFromPoint(
             boolean useDFS,
             Canvas canvas,
@@ -31,6 +42,20 @@ public class FillAlg {
         floodFill(visited, width, height, startX, startY, targetColor, replacement, snapshot, gc, useDFS, diagonals);
     }
 
+    /**
+     * Performs a flood fill operation using either Depth-First Search (DFS) or Breadth-First Search (BFS).
+     * @param visited A 2D array to keep track of visited pixels.
+     * @param width The width of the canvas.
+     * @param height The height of the canvas.
+     * @param startX The x-coordinate of the starting point for the fill.
+     * @param startY The y-coordinate of the starting point for the fill.
+     * @param targetColor The color of the target area to fill.
+     * @param replacement The color to replace the target color with.
+     * @param snapshot The snapshot of the canvas.
+     * @param gc The GraphicsContext of the canvas to draw on.
+     * @param useDFS If true, uses Depth-First Search; otherwise, uses Breadth-First Search.
+     * @param diagonals If true, allows diagonal filling; otherwise, only fills orthogonally.
+     */
     private static void floodFill(
             boolean[][] visited,
             int width,

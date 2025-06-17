@@ -5,6 +5,9 @@ import javafx.util.Pair;
 import java.util.LinkedList;
 import java.util.Queue;
 
+/**
+ * QueueContainer is an implementation of FloodContainer that uses a queue to store coordinates in FIFO order.
+ */
 public class QueueContainer extends FloodContainer {
 
     Queue<Pair<Integer, Integer>> queue;

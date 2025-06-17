@@ -11,6 +11,7 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.ArcType;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -32,6 +33,8 @@ public class Main extends Application {
 
         setupCanvas(gc, width, height);
 
+
+        // Radio buttons for algorithm selection
         ToggleGroup algorithmGroup = new ToggleGroup();
 
         RadioButton dfsRadioButton = new RadioButton("DFS (Depth-First Search)");
@@ -41,7 +44,10 @@ public class Main extends Application {
         bfsRadioButton.setToggleGroup(algorithmGroup);
 
         dfsRadioButton.setSelected(true); // Default to DFS
+        HBox algBox = new HBox(10, dfsRadioButton, bfsRadioButton);
 
+
+        // Radio buttons for diagonal filling
         ToggleGroup diagonalsGroup = new ToggleGroup();
 
         RadioButton diagonalButton = new RadioButton("With Diagonals");
@@ -51,51 +57,52 @@ public class Main extends Application {
         nonDiagonalButton.setToggleGroup(diagonalsGroup);
 
         nonDiagonalButton.setSelected(true); // Default to non-diagonal
-
-        HBox algBox = new HBox(10, dfsRadioButton, bfsRadioButton);
-
         HBox diagonalBox = new HBox(10, diagonalButton, nonDiagonalButton);
+
 
         //Points for convex fill
         ArrayList<Point> points = new ArrayList<>();
-
+        // Radio buttons for fill mode selection (Pineda or Flood Fill)
         ToggleGroup modeGroup = new ToggleGroup();
         RadioButton fillAllModeButton = new RadioButton("Fill space");
         RadioButton drawModeButton = new RadioButton("Set points for convex fill");
-        Button FillConvexShapeButton = new Button("Fill Shape");
+
+        Button FillConvexShapeButton = new Button("Fill Shape");// Button to fill the convex shape
         FillConvexShapeButton.setOnAction(event -> {
             if (drawModeButton.isSelected()) {
                 ConvexFill.pinedaFill(points, canvas);
             }
         });
+
         fillAllModeButton.setToggleGroup(modeGroup);
         drawModeButton.setToggleGroup(modeGroup);
         fillAllModeButton.setSelected(true); // Default to fill mode
         HBox modeBox = new HBox(10, fillAllModeButton, drawModeButton, FillConvexShapeButton);
 
 
-        // Add the radio buttons to the canvas
+        // Set up the canvas mouse click event
         canvas.setOnMouseClicked(event -> {
-            if (fillAllModeButton.isSelected()) {
+            if (fillAllModeButton.isSelected()) {// Flood fill mode
                 boolean useDFS = dfsRadioButton.isSelected();
                 boolean diagonals = diagonalButton.isSelected();
-                FillAlg.fillFromPoint(useDFS, canvas, gc,(int) event.getX(), (int) event.getY(), diagonals);
-            } else {
+                FillAlg.fillFromPoint(useDFS, canvas, gc, (int) event.getX(), (int) event.getY(), diagonals);
+            } else {// Pineda's fill mode
                 ConvexFill.setPoint(points, canvas, (int) event.getX(), (int) event.getY());
             }
         });
 
 
-        // Set the background color of the canvas
-
-        VBox root = new VBox(10, algBox, diagonalBox,modeBox, canvas);
-        Scene scene = new Scene(root, width, width);
+        VBox root = new VBox(10, algBox, diagonalBox, modeBox, canvas);
+        Scene scene = new Scene(root, width, height*1.15);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
+    /**
+     * Sets up the canvas with a face drawing and a frame.
+     */
     private void setupCanvas(GraphicsContext gc, double width, double height) {
-        // Face
+        // FACE
         gc.setStroke(javafx.scene.paint.Color.BLUE);
         gc.setLineWidth(5);
         gc.strokeOval(width / 8, height / 8, width / 1.5, height / 1.5);
@@ -113,10 +120,9 @@ public class Main extends Application {
         // MOUTH
         gc.setFill(Color.RED);
         gc.setLineWidth(2);
-        gc.strokeArc(width / 3, height / 2, width / 4, height / 4, 0, -180, javafx.scene.shape.ArcType.OPEN);
+        gc.strokeArc(width / 3, height / 2, width / 4, height / 4, 0, -180, ArcType.OPEN);
 
-        // Frame
-        gc.setStroke(Color.BLACK);
+        // FRAME
         gc.setLineWidth(10);
         gc.setStroke(Color.RED);
         gc.strokeRect(10, 30, width - 20, height - 40);
