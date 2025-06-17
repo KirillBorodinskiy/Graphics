@@ -6,7 +6,7 @@
 
     <groupId>org.borodkir</groupId>
     <artifactId>Graphics</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <name>Graphics</name>
 
     <properties>
@@ -57,10 +57,9 @@
                 <version>0.0.8</version>
                 <executions>
                     <execution>
-                        <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>org.borodkir.graphics/org.borodkir.graphics.HelloApplication</mainClass>
+                            <mainClass>org.borodkir.graphics/org.borodkir.graphics.Main</mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
                             <jlinkImageName>app</jlinkImageName>
